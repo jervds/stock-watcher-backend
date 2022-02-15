@@ -6,6 +6,8 @@ plugins {
 	kotlin("jvm") version "1.6.10"
 	kotlin("plugin.spring") version "1.6.10"
 	kotlin("plugin.jpa") version "1.6.10"
+	jacoco
+	id("org.barfuin.gradle.jacocolog") version "2.0.0"
 }
 
 group = "com.jervds"
@@ -40,3 +42,14 @@ tasks.withType<KotlinCompile> {
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
+
+
+
+tasks.check {
+	finalizedBy(tasks.jacocoTestReport)
+}
+tasks.jacocoTestReport {
+	dependsOn(tasks.check)
+}
+
+
