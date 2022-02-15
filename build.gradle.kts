@@ -50,4 +50,12 @@ tasks.jacocoTestReport {
     dependsOn(tasks.check)
 }
 
-
+tasks.withType<JacocoReport> {
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.map {
+            fileTree(it).apply {
+                exclude("**/App*")
+            }
+        }))
+    }
+}
