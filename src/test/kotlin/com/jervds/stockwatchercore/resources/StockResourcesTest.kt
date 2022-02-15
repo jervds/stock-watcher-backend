@@ -30,7 +30,7 @@ class StockResourcesTest(
     fun `create a product in stock should return created product`() {
         webTestClient.post()
                 .uri("$API$PRODUCT")
-                .bodyValue(StockDto(id=null,productName = "test product"))
+                .bodyValue(StockDto(id = null, productName = "test product"))
                 .exchange()
                 .expectStatus().isOk
                 .expectBody<StockDto>()
@@ -44,7 +44,7 @@ class StockResourcesTest(
     fun `create a product in stock should create the product in database`() {
         webTestClient.post()
                 .uri("$API$PRODUCT")
-                .bodyValue(StockDto(id=null,productName = "test product"))
+                .bodyValue(StockDto(id = null, productName = "test product"))
                 .exchange()
                 .expectStatus().isOk
                 .expectBody<StockDto>()
