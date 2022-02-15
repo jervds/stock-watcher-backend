@@ -14,4 +14,8 @@ class StockService(
         return stockRepository.save(product)
     }
 
+    fun findById(id: String): Mono<Product> {
+        return stockRepository.findById(id)
+    }
+
 }
