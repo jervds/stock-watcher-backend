@@ -1,11 +1,19 @@
 package com.jervds.stockwatchercore.service
 
-import com.jervds.stockwatchercore.model.StockDto
+import com.jervds.stockwatchercore.model.dto.StockDto
+import com.jervds.stockwatchercore.model.entity.Stock
+import com.jervds.stockwatchercore.repository.StockRepository
+import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 
 @Service
-class StockService {
+class StockService(
+        private val stockRepository: StockRepository
+) {
 
-    fun test() = Mono.just(StockDto(stock =1))
+    fun create(stock: Stock): Mono<Stock> {
+        return stockRepository.save(stock)
+    }
+
 }
