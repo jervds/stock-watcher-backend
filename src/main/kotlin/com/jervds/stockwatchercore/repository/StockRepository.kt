@@ -1,12 +1,12 @@
 package com.jervds.stockwatchercore.repository
 
-import com.jervds.stockwatchercore.model.entity.Stock
+import com.jervds.stockwatchercore.model.entity.Product
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Mono
 
 
 @Repository
-interface StockRepository : ReactiveMongoRepository<Stock, String> {
-    fun findByProductName(productName: String): Mono<Stock>
+interface StockRepository : ReactiveMongoRepository<Product, String> {
+    fun findByProductName(productName: String): Mono<Product>
 }

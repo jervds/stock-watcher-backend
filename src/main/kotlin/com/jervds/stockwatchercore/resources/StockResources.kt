@@ -2,7 +2,8 @@ package com.jervds.stockwatchercore.resources
 
 import com.jervds.stockwatchercore.mapper.toDto
 import com.jervds.stockwatchercore.mapper.toEntity
-import com.jervds.stockwatchercore.model.dto.StockDto
+import com.jervds.stockwatchercore.model.dto.ProductCreateDto
+import com.jervds.stockwatchercore.model.dto.ProductDto
 import com.jervds.stockwatchercore.resources.StockResources.Companion.API
 import com.jervds.stockwatchercore.service.StockService
 import org.springframework.web.bind.annotation.PostMapping
@@ -18,7 +19,7 @@ class StockResources(
 ) {
 
     @PostMapping(PRODUCT)
-    fun create(@RequestBody product: StockDto): Mono<StockDto> = stockService.create(product.toEntity()).map { it.toDto() }
+    fun create(@RequestBody product: ProductCreateDto): Mono<ProductDto> = stockService.create(product.toEntity()).map { it.toDto() }
 
     companion object {
         const val API = "/api"

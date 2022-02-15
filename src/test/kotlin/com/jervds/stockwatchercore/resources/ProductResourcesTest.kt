@@ -1,6 +1,7 @@
 package com.jervds.stockwatchercore.resources
 
-import com.jervds.stockwatchercore.model.dto.StockDto
+import com.jervds.stockwatchercore.model.dto.ProductCreateDto
+import com.jervds.stockwatchercore.model.dto.ProductDto
 import com.jervds.stockwatchercore.repository.StockRepository
 import com.jervds.stockwatchercore.resources.StockResources.Companion.API
 import com.jervds.stockwatchercore.resources.StockResources.Companion.PRODUCT
@@ -16,7 +17,7 @@ import org.springframework.test.web.reactive.server.expectBody
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
-class StockResourcesTest(
+class ProductResourcesTest(
         @Autowired private val webTestClient: WebTestClient,
         @Autowired private val stockRepository: StockRepository
 ) {
@@ -30,10 +31,10 @@ class StockResourcesTest(
     fun `create a product in stock should return created product`() {
         webTestClient.post()
                 .uri("$API$PRODUCT")
-                .bodyValue(StockDto(id = null, productName = "test product"))
+                .bodyValue(ProductCreateDto(productName = "test product"))
                 .exchange()
                 .expectStatus().isOk
-                .expectBody<StockDto>()
+                .expectBody<ProductDto>()
                 .consumeWith { res ->
                     val product = res.responseBody!!
                     assertThat(product.productName).isEqualTo("test product")
@@ -44,10 +45,10 @@ class StockResourcesTest(
     fun `create a product in stock should create the product in database`() {
         webTestClient.post()
                 .uri("$API$PRODUCT")
-                .bodyValue(StockDto(id = null, productName = "test product"))
+                .bodyValue(ProductCreateDto(productName = "test product"))
                 .exchange()
                 .expectStatus().isOk
-                .expectBody<StockDto>()
+                .expectBody<ProductDto>()
                 .consumeWith { res ->
                     val product = res.responseBody!!
                     val productFromDatabase = stockRepository.findById(product.id!!).block()!!

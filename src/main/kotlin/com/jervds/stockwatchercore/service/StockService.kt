@@ -1,6 +1,6 @@
 package com.jervds.stockwatchercore.service
 
-import com.jervds.stockwatchercore.model.entity.Stock
+import com.jervds.stockwatchercore.model.entity.Product
 import com.jervds.stockwatchercore.repository.StockRepository
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
@@ -10,8 +10,8 @@ class StockService(
         private val stockRepository: StockRepository
 ) {
 
-    fun create(stock: Stock): Mono<Stock> {
-        return stockRepository.save(stock)
+    fun create(product: Product): Mono<Product> {
+        return stockRepository.save(product)
     }
 
 }
