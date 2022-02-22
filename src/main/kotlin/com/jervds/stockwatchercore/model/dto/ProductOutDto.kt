@@ -1,6 +1,6 @@
 package com.jervds.stockwatchercore.model.dto
 
-data class ProductDto(
+data class ProductOutDto(
         val id: String,
         val productName: String,
 )

@@ -18,4 +18,8 @@ class StockService(
         return stockRepository.findById(id)
     }
 
+    fun put(product: Product): Mono<Product> {
+        return stockRepository.save(product)
+    }
+
 }
