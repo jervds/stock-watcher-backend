@@ -173,13 +173,16 @@ class ProductResourcesTest(
 
 
     @Test
-    @Disabled
     fun `patch should not update a stock bellow zero`() {
-
+        webTestClient.patch()
+            .uri("$API$PRODUCT$ID", DEFAULT_PRODUCT_ID)
+            .bodyValue(simplePatchProductDto(quantityInStock = -1))
+            .exchange()
+            .expectStatus().isBadRequest
+        //TODO Complete me (body, error type, error message,...)
     }
 
     @Test
-    @Disabled
     fun `patch should update a stock equal to zero`() {
         whenPatching(simplePatchProductDto(quantityInStock = 0))
             .expectBody<ProductOutDto>()
@@ -192,9 +195,13 @@ class ProductResourcesTest(
     }
 
     @Test
-    @Disabled
     fun `patch should return error when id does not exist`() {
-
+        webTestClient.patch()
+            .uri("$API$PRODUCT$ID", NOT_EXISTING_PRODUCT_ID)
+            .bodyValue(simplePatchProductDto())
+            .exchange()
+            .expectStatus().isBadRequest
+        //TODO Complete me (body, error type, error message,...)
     }
 
     @Test

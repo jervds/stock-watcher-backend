@@ -7,6 +7,7 @@ import org.bson.types.ObjectId
 
 const val DEFAULT_PRODUCT_NAME = "sample product"
 val DEFAULT_PRODUCT_ID = ObjectId("000000000000000000000001")
+val NOT_EXISTING_PRODUCT_ID = ObjectId("000000000000000000000002")
 const val DEFAULT_PRODUCT_QUANTITY = 5
 
 fun simpleCreateProductDto(

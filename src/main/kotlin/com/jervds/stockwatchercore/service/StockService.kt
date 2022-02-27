@@ -1,5 +1,7 @@
 package com.jervds.stockwatchercore.service
 
+import com.jervds.stockwatchercore.error.StockWatcherException.PRODUCT_QUANTITY_SHOULD_BE_POSITIVE
+import com.jervds.stockwatchercore.error.StockWatcherException.UNKNOWN_PRODUCT
 import com.jervds.stockwatchercore.model.entity.Product
 import com.jervds.stockwatchercore.repository.StockRepository
 import org.springframework.stereotype.Service
@@ -20,7 +22,11 @@ class StockService(
 
     fun patch(id: String, productName: String?, quantityInStock: Int?): Mono<Product> {
         return findById(id)
-            .switchIfEmpty(Mono.error(Exception("TODO")))
+            .switchIfEmpty(Mono.error(UNKNOWN_PRODUCT.toException()))
+            .map { product ->
+                quantityInStock?.let { validateStockQuantity(it) }
+                product
+            }
             .map { product ->
                 productName?.let { product.productName = productName }
                 quantityInStock?.let { product.quantityInStock = quantityInStock }
@@ -29,5 +35,8 @@ class StockService(
             .flatMap(stockRepository::save)
     }
 
+    private fun validateStockQuantity(quantityInStock: Int) {
+        if (quantityInStock < 0) throw PRODUCT_QUANTITY_SHOULD_BE_POSITIVE.toException()
+    }
 
 }
