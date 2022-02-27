@@ -1,9 +1,8 @@
 package com.jervds.stockwatchercore.resources
 
-import com.jervds.stockwatchercore.helper.DEFAULT_PRODUCT_ID
-import com.jervds.stockwatchercore.helper.DEFAULT_PRODUCT_NAME
-import com.jervds.stockwatchercore.helper.simpleCreateProductDto
-import com.jervds.stockwatchercore.helper.simpleProduct
+import com.jervds.stockwatchercore.helper.*
+import com.jervds.stockwatchercore.model.dto.ProductCreateDto
+import com.jervds.stockwatchercore.model.dto.ProductInDto
 import com.jervds.stockwatchercore.model.dto.ProductOutDto
 import com.jervds.stockwatchercore.repository.StockRepository
 import com.jervds.stockwatchercore.resources.StockResources.Companion.API
@@ -33,13 +32,17 @@ class ProductResourcesTest(
         stockRepository.save(simpleProduct(id = DEFAULT_PRODUCT_ID)).block()
     }
 
+    private fun whenCreatingAProduct(simpleProduct: ProductCreateDto = simpleCreateProductDto()): WebTestClient.ResponseSpec {
+        return webTestClient.post()
+            .uri("$API$PRODUCT")
+            .bodyValue(simpleProduct)
+            .exchange()
+            .expectStatus().isCreated
+    }
+
     @Test
     fun `create a product in stock should return created product`() {
-        webTestClient.post()
-                .uri("$API$PRODUCT")
-                .bodyValue(simpleCreateProductDto())
-                .exchange()
-                .expectStatus().isCreated
+        whenCreatingAProduct()
                 .expectBody<ProductOutDto>()
                 .consumeWith { res ->
                     val product = res.responseBody!!
@@ -49,11 +52,7 @@ class ProductResourcesTest(
 
     @Test
     fun `create a product in stock should create the product in database`() {
-        webTestClient.post()
-                .uri("$API$PRODUCT")
-                .bodyValue(simpleCreateProductDto())
-                .exchange()
-                .expectStatus().isCreated
+        whenCreatingAProduct()
                 .expectBody<ProductOutDto>()
                 .consumeWith { res ->
                     val product = res.responseBody!!
@@ -61,6 +60,37 @@ class ProductResourcesTest(
                     assertThat(product.productName).isEqualTo(productFromDatabase.productName)
                     assertThat(product.id).isEqualTo("${productFromDatabase.id}")
                 }
+    }
+
+    @Test
+    @Disabled
+    fun `create should create with a stock to zero`() {
+        whenCreatingAProduct()
+            .expectBody<ProductOutDto>()
+            .consumeWith { res ->
+                val product = res.responseBody!!
+                val productFromDatabase = stockRepository.findById(product.id).block()!!
+                assertThat(product.quantityInStock).isEqualTo(productFromDatabase.quantityInStock)
+                assertThat(product.quantityInStock).isEqualTo(0)
+            }
+    }
+
+    @Test
+    @Disabled
+    fun `create should accept an external identifier for the product`() {
+        //ex: code barre
+    }
+
+    @Test
+    @Disabled
+    fun `create should fail when external identifier already exists`() {
+
+    }
+
+    @Test
+    @Disabled
+    fun `create should succeed when external identifier already exists and creation is forced`() {
+        //Also check other value for forced if from path
     }
 
     @Test
@@ -74,6 +104,7 @@ class ProductResourcesTest(
                     val product = res.responseBody!!
                     assertThat(product.productName).isEqualTo(DEFAULT_PRODUCT_NAME)
                     assertThat(product.id).isEqualTo("$DEFAULT_PRODUCT_ID")
+                    assertThat(product.quantityInStock).isEqualTo(DEFAULT_PRODUCT_QUANTITY)
                     //TODO add stock
                 }
     }
@@ -84,19 +115,62 @@ class ProductResourcesTest(
 
     }
 
+    private fun whenPatching(simplePatchProductDto: ProductInDto = simplePatchProductDto()): WebTestClient.ResponseSpec {
+        return webTestClient.patch()
+            .uri("$API$PRODUCT$ID", DEFAULT_PRODUCT_ID)
+            .bodyValue(simplePatchProductDto)
+            .exchange()
+            .expectStatus().isOk
+    }
+
     @Test
-    fun `patch should update a product`() {
-        webTestClient.patch()
-                .uri("$API$PRODUCT$ID", DEFAULT_PRODUCT_ID)
-                .bodyValue(simpleCreateProductDto(productName = "updated product name"))
-                .exchange()
-                .expectStatus().isOk
+    fun `patch should update a product when name is provided`() {
+        whenPatching(simplePatchProductDto(productName = "updated product name"))
                 .expectBody<ProductOutDto>()
                 .consumeWith { res ->
                     val product = res.responseBody!!
+                    val productFromDatabase = stockRepository.findById(product.id).block()!!
                     assertThat(product.productName).isEqualTo("updated product name")
+                    assertThat(product.productName).isEqualTo(productFromDatabase.productName)
                 }
     }
+
+    @Test
+    fun `patch should update a product when stock is provided`() {
+        whenPatching(simplePatchProductDto(quantityInStock = 10))
+            .expectBody<ProductOutDto>()
+            .consumeWith { res ->
+                val product = res.responseBody!!
+                val productFromDatabase = stockRepository.findById(product.id).block()!!
+                assertThat(product.quantityInStock).isEqualTo(10)
+                assertThat(product.quantityInStock).isEqualTo(productFromDatabase.quantityInStock)
+            }
+    }
+
+    @Test
+    fun `patch should not update product name when name is not provided`() {
+        whenPatching(simplePatchProductDto(productName = null))
+            .expectBody<ProductOutDto>()
+            .consumeWith { res ->
+                val product = res.responseBody!!
+                val productFromDatabase = stockRepository.findById(product.id).block()!!
+                assertThat(product.productName).isEqualTo(DEFAULT_PRODUCT_NAME)
+                assertThat(product.productName).isEqualTo(productFromDatabase.productName)
+            }
+    }
+
+    @Test
+    fun `patch should not update stock when stock is not provided`() {
+        whenPatching(simplePatchProductDto(quantityInStock = null))
+            .expectBody<ProductOutDto>()
+            .consumeWith { res ->
+                val product = res.responseBody!!
+                val productFromDatabase = stockRepository.findById(product.id).block()!!
+                assertThat(product.quantityInStock).isEqualTo(DEFAULT_PRODUCT_QUANTITY)
+                assertThat(product.quantityInStock).isEqualTo(productFromDatabase.quantityInStock)
+            }
+    }
+
 
     @Test
     @Disabled
@@ -106,20 +180,15 @@ class ProductResourcesTest(
 
     @Test
     @Disabled
-    fun `patch should update only provided fields`() {
-
-    }
-
-    @Test
-    @Disabled
     fun `patch should update a stock equal to zero`() {
-
-    }
-
-    @Test
-    @Disabled
-    fun `create should create with a stock to zero`() {
-
+        whenPatching(simplePatchProductDto(quantityInStock = 0))
+            .expectBody<ProductOutDto>()
+            .consumeWith { res ->
+                val product = res.responseBody!!
+                val productFromDatabase = stockRepository.findById(product.id).block()!!
+                assertThat(product.quantityInStock).isEqualTo(0)
+                assertThat(product.quantityInStock).isEqualTo(productFromDatabase.quantityInStock)
+            }
     }
 
     @Test
@@ -171,22 +240,5 @@ class ProductResourcesTest(
         //TODO find should return description
     }
 
-    @Test
-    @Disabled
-    fun `create should accept an external identifier for the product`() {
-        //ex: code barre
-    }
-
-    @Test
-    @Disabled
-    fun `create should fail when external identifier already exists`() {
-
-    }
-
-    @Test
-    @Disabled
-    fun `create should succeed when external identifier already exists and creation is forced`() {
-        //Also check other value for forced if from path
-    }
 
 }

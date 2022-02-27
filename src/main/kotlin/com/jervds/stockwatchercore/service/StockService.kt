@@ -7,7 +7,7 @@ import reactor.core.publisher.Mono
 
 @Service
 class StockService(
-        private val stockRepository: StockRepository
+    private val stockRepository: StockRepository
 ) {
 
     fun create(product: Product): Mono<Product> {
@@ -18,8 +18,16 @@ class StockService(
         return stockRepository.findById(id)
     }
 
-    fun put(product: Product): Mono<Product> {
-        return stockRepository.save(product)
+    fun patch(id: String, productName: String?, quantityInStock: Int?): Mono<Product> {
+        return findById(id)
+            .switchIfEmpty(Mono.error(Exception("TODO")))
+            .map { product ->
+                productName?.let { product.productName = productName }
+                quantityInStock?.let { product.quantityInStock = quantityInStock }
+                product
+            }
+            .flatMap(stockRepository::save)
     }
+
 
 }
