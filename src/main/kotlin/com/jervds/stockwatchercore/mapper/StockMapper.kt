@@ -7,4 +7,8 @@ import org.bson.types.ObjectId
 
 fun Product.toDto() = ProductOutDto(id = "$id", productName = productName, quantityInStock = quantityInStock)
 
-fun ProductCreateDto.toEntity() = Product(ObjectId(), productName = productName, quantityInStock = 0)
+fun ProductCreateDto.toEntity() = Product(
+    ObjectId(),
+    productName = productName,
+    quantityInStock = 0
+)

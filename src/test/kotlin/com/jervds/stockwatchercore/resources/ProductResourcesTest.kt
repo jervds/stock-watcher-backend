@@ -63,7 +63,6 @@ class ProductResourcesTest(
     }
 
     @Test
-    @Disabled
     fun `create should create with a stock to zero`() {
         whenCreatingAProduct()
             .expectBody<ProductOutDto>()
@@ -202,12 +201,6 @@ class ProductResourcesTest(
             .exchange()
             .expectStatus().isBadRequest
         //TODO Complete me (body, error type, error message,...)
-    }
-
-    @Test
-    @Disabled
-    fun `patch should not update when product has been updated in meantime`() {
-
     }
 
     @Test
