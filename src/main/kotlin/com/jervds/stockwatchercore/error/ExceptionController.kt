@@ -10,7 +10,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 class ExceptionController {
 
     @ExceptionHandler(CatchableException::class)
-    internal fun exception(exception: CatchableException): ResponseEntity<Any> {
-        return ResponseEntity(ErrorDto(exception.msg), exception.code)
+    internal fun exception(exception: CatchableException): ResponseEntity<ErrorDto> {
+        return ResponseEntity(
+            ErrorDto(
+                feedbackCode = exception.feedback.name,
+                message = exception.feedback.message
+            ),
+            exception.feedback.status
+        )
     }
 }
